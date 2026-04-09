@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星际征途探索强手棋 — 项目说明书</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1f2937;
+    --border: #30363d;
+    --accent: #58a6ff;
+    --accent2: #f78166;
+    --accent3: #56d364;
+    --accent4: #e3b341;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --code-bg: #0d1117;
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Noto Sans SC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, #0f2044 0%, #1a1035 50%, #0d1a33 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(88,166,255,.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 30%, rgba(86,211,100,.05) 0%, transparent 60%);
+  }
+  header .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 15%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 40%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 10% 70%, rgba(255,255,255,.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 80%, rgba(255,255,255,.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,.3) 0%, transparent 100%);
+  }
+  header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    position: relative;
+    text-shadow: 0 0 40px rgba(88,166,255,.4);
+  }
+  header .subtitle {
+    color: var(--text-muted);
+    font-size: .95rem;
+    margin-top: 8px;
+    position: relative;
+  }
+  header .badge-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+    position: relative;
+  }
+  .badge {
+    background: rgba(88,166,255,.15);
+    border: 1px solid rgba(88,166,255,.3);
+    color: var(--accent);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: .8rem;
+    font-weight: 500;
+  }
+  .badge.green { background: rgba(86,211,100,.12); border-color: rgba(86,211,100,.3); color: var(--accent3); }
+  .badge.yellow { background: rgba(227,179,65,.12); border-color: rgba(227,179,65,.3); color: var(--accent4); }
+
+  /* ── Language Toggle ── */
+  .lang-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .lang-bar span { color: var(--text-muted); font-size: .85rem; }
+  .lang-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: .85rem;
+    transition: background .15s, border-color .15s;
+  }
+  .lang-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+    font-weight: 600;
+  }
+  .lang-btn:not(.active):hover { background: #2d333b; border-color: #58a6ff55; }
+
+  /* ── Layout ── */
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── Nav ── */
+  nav {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 40px;
+  }
+  nav h3 { color: var(--accent); font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 12px; }
+  nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+  nav ul li a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: .9rem;
+    transition: color .15s;
+  }
+  nav ul li a:hover { color: var(--accent); }
+
+  /* ── Sections ── */
+  section { margin-bottom: 56px; }
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2 .icon { font-size: 1.2rem; }
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent4);
+    margin: 28px 0 12px;
+  }
+  h4 {
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--accent3);
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 12px; color: var(--text); }
+
+  /* ── File Cards ── */
+  .file-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 8px; }
+  @media (max-width: 640px) { .file-grid { grid-template-columns: 1fr; } }
+  .file-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    transition: border-color .15s;
+  }
+  .file-card:hover { border-color: var(--accent); }
+  .file-card .fname {
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    font-size: .9rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .file-card .fname .tag {
+    background: rgba(88,166,255,.15);
+    border: 1px solid rgba(88,166,255,.25);
+    font-size: .7rem;
+    padding: 1px 7px;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-weight: 400;
+  }
+  .file-card .tag.data { background: rgba(227,179,65,.12); border-color: rgba(227,179,65,.3); color: var(--accent4); }
+  .file-card .tag.tool { background: rgba(247,129,102,.12); border-color: rgba(247,129,102,.3); color: var(--accent2); }
+  .file-card .tag.md { background: rgba(86,211,100,.12); border-color: rgba(86,211,100,.3); color: var(--accent3); }
+  .file-card .desc { font-size: .88rem; color: var(--text-muted); line-height: 1.6; }
+  .file-card .desc ul { margin-left: 18px; margin-top: 6px; }
+  .file-card .desc ul li { margin-bottom: 3px; }
+
+  /* ── Tables ── */
+  .table-wrap { overflow-x: auto; margin: 16px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+  }
+  thead th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  tbody tr:hover td { background: rgba(255,255,255,.02); }
+  td code, th code {
+    font-family: "Fira Code", monospace;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: .82rem;
+    color: #79c0ff;
+  }
+  td strong { color: var(--accent4); }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(88,166,255,.06);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 16px;
+    margin: 14px 0;
+    font-size: .9rem;
+    color: var(--text);
+  }
+  .callout.yellow { border-color: var(--accent4); background: rgba(227,179,65,.06); }
+  .callout.green  { border-color: var(--accent3); background: rgba(86,211,100,.06); }
+  .callout.red    { border-color: var(--accent2); background: rgba(247,129,102,.06); }
+
+  /* ── Rule list ── */
+  ol.rules { margin-left: 20px; }
+  ol.rules li { margin-bottom: 8px; padding-left: 4px; }
+  ul.bullets { margin-left: 20px; margin-bottom: 12px; }
+  ul.bullets li { margin-bottom: 6px; padding-left: 4px; }
+
+  /* ── Cell grid ── */
+  .cell-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin: 16px 0; }
+  .cell-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 13px;
+    font-size: .85rem;
+  }
+  .cell-item .ct { font-weight: 600; color: var(--accent4); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+  .cell-item .cn { color: var(--text); margin-top: 2px; }
+
+  /* ── Card list ── */
+  .card-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  @media (max-width: 580px) { .card-list { grid-template-columns: 1fr; } }
+  .card-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 11px 14px;
+    font-size: .85rem;
+  }
+  .card-item .cname { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .card-item .ceff { color: var(--accent4); font-size: .82rem; margin-bottom: 2px; }
+  .card-item .ctiming { color: var(--text-muted); font-size: .78rem; }
+
+  /* ── Folder tree ── */
+  .tree {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    font-family: "Fira Code", "Cascadia Code", monospace;
+    font-size: .85rem;
+    line-height: 2;
+    color: var(--text-muted);
+    margin: 16px 0;
+  }
+  .tree .dir { color: var(--accent); }
+  .tree .py  { color: #79c0ff; }
+  .tree .md  { color: var(--accent3); }
+  .tree .img { color: var(--accent4); }
+  .tree .json { color: #d2a8ff; }
+  .tree .comment { color: #484f58; }
+
+  /* ── Flow ── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 16px 0;
+    align-items: center;
+  }
+  .flow-step {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: .85rem;
+    text-align: center;
+  }
+  .flow-arrow {
+    color: var(--text-muted);
+    padding: 0 6px;
+    font-size: 1rem;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: .82rem;
+  }
+
+  /* ── Lang visibility ── */
+  [data-lang="en"] { display: none; }
+  body.en [data-lang="zh"] { display: none; }
+  body.en [data-lang="en"] { display: revert; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stars"></div>
+  <h1>⭐ <span data-lang="zh">星际征途探索强手棋</span><span data-lang="en">Space Chess: Cosmic Explorer</span></h1>
+  <div class="subtitle">
+    <span data-lang="zh">Python / pygame 重实现 · 基于 Scratch 原版</span>
+    <span data-lang="en">Python / pygame reimplementation · Based on the original Scratch project</span>
+  </div>
+  <div class="badge-row">
+    <span class="badge">Python 3.12</span>
+    <span class="badge green">pygame 2.x</span>
+    <span class="badge yellow">2–6 <span data-lang="zh">人</span><span data-lang="en">players</span></span>
+  </div>
+</header>
+
+<div class="lang-bar">
+  <span data-lang="zh">语言：</span>
+  <span data-lang="en">Language: </span>
+  <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')">中文</button>
+  <button class="lang-btn" id="btn-en" onclick="setLang('en')">English</button>
+</div>
+
+<div class="container">
+
+  <!-- NAV -->
+  <nav>
+    <h3><span data-lang="zh">目录</span><span data-lang="en">Contents</span></h3>
+    <ul>
+      <li><a href="#structure"><span data-lang="zh">📁 项目结构</span><span data-lang="en">📁 Project Structure</span></a></li>
+      <li><a href="#dev-py"><span data-lang="zh">🐍 Python 文件说明</span><span data-lang="en">🐍 Python Files</span></a></li>
+      <li><a href="#dev-md"><span data-lang="zh">📝 数据文件说明</span><span data-lang="en">📝 Data Files</span></a></li>
+      <li><a href="#quickstart"><span data-lang="zh">🚀 快速开始</span><span data-lang="en">🚀 Quick Start</span></a></li>
+      <li><a href="#rules-overview"><span data-lang="zh">🎲 游戏规则概览</span><span data-lang="en">🎲 Rules Overview</span></a></li>
+      <li><a href="#rules-board"><span data-lang="zh">🗺 棋盘格子</span><span data-lang="en">🗺 Board Cells</span></a></li>
+      <li><a href="#rules-planets"><span data-lang="zh">🪐 星球探索</span><span data-lang="en">🪐 Planet Exploration</span></a></li>
+      <li><a href="#rules-cards"><span data-lang="zh">🃏 卡牌</span><span data-lang="en">🃏 Cards</span></a></li>
+      <li><a href="#rules-end"><span data-lang="zh">🏆 游戏结束</span><span data-lang="en">🏆 Game End</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--  DEVELOPER SECTION                    -->
+  <!-- ══════════════════════════════════════ -->
+
+  <section id="structure">
+    <h2><span class="icon">📁</span>
+      <span data-lang="zh">项目结构</span>
+      <span data-lang="en">Project Structure</span>
+    </h2>
+
+    <div class="tree">
+      <span class="dir">spacechess/</span><br>
+      &nbsp;&nbsp;├── <span class="py">main.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 主程序入口 / Entry point</span><br>
+      &nbsp;&nbsp;├── <span class="dir">src/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 源代码 / Source code</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">data.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">game.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">ui.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">lang.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">calibrate.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="py">calibrate_tokens.py</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="py">crop_tool.py</span><br>
+      &nbsp;&nbsp;├── <span class="dir">data/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 游戏数据文件 / Game data files</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="md">星球信息.md</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="md">事件卡.md</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="md">机会卡.md</span><br>
+      &nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="md">规则书.md</span><br>
+      &nbsp;&nbsp;└── <span class="dir">assets/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 图片和音乐资源 / Assets</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">background/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 棋盘图、背景音乐 / Board PNGs, BGM</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="img">board.png</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="img">board_en.png</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp; ├── <span class="img">bgm.mp3</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp; └── <span class="json">calibration.json</span> &nbsp;&nbsp;<span class="comment"># 格子中心坐标 / Cell centers</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">players/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment"># 玩家头像 player_0.png … / Player avatars</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">planets/circles/</span> &nbsp;&nbsp;<span class="comment"># 星球圆形图片 / Planet circle images</span><br>
+    </div>
+  </section>
+
+  <section id="dev-py">
+    <h2><span class="icon">🐍</span>
+      <span data-lang="zh">Python 文件说明</span>
+      <span data-lang="en">Python Files</span>
+    </h2>
+
+    <!-- main.py -->
+    <h3>main.py &nbsp;<span style="color:var(--text-muted);font-weight:400;font-size:.9rem" data-lang="zh">— 主程序入口</span><span style="color:var(--text-muted);font-weight:400;font-size:.9rem" data-lang="en">— Entry point</span></h3>
+    <p data-lang="zh">
+      位于项目根目录，直接运行启动游戏（<code>python main.py</code>）。
+      它将 <code>src/</code> 加入 <code>sys.path</code>，然后导入其他模块。
+      负责 pygame 主循环、所有鼠标/键盘事件的分发、按钮绘制与交互、以及游戏状态的驱动。
+    </p>
+    <p data-lang="en">
+      Lives at the project root; run it to start the game (<code>python main.py</code>).
+      It adds <code>src/</code> to <code>sys.path</code>, then imports the other modules.
+      Owns the pygame main loop, all mouse/keyboard event dispatch, button rendering and interaction, and game-state driving.
+    </p>
+    <div class="callout">
+      <span data-lang="zh"><strong>职责范围：</strong>事件循环 → 路由到正确的 GamePhase 处理器 → 调用 ui.py 的 draw_* 函数 → flip 屏幕。游戏状态本身由 game.py 维护。</span>
+      <span data-lang="en"><strong>Scope:</strong> event loop → route to the correct GamePhase handler → call ui.py draw_* functions → flip screen. Game state is owned by game.py.</span>
+    </div>
+
+    <div class="file-grid">
+
+      <!-- data.py -->
+      <div class="file-card">
+        <div class="fname">src/data.py <span class="tag data" data-lang="zh">数据</span><span class="tag data" data-lang="en">data</span></div>
+        <div class="desc">
+          <span data-lang="zh">所有静态游戏数据的唯一来源：</span>
+          <span data-lang="en">Single source of truth for all static game data:</span>
+          <ul>
+            <li data-lang="zh"><code>BOARD</code> — 32 格棋盘定义（名称、英文名、格子类型）</li>
+            <li data-lang="en"><code>BOARD</code> — 32-cell board definition (name, English name, cell type)</li>
+            <li data-lang="zh"><code>PLANETS</code> — 19 颗星球（从 <code>data/星球信息.md</code> 启动时读取）</li>
+            <li data-lang="en"><code>PLANETS</code> — 19 planets (parsed from <code>data/星球信息.md</code> at startup)</li>
+            <li data-lang="zh"><code>EVENT_CARDS / CHANCE_CARDS</code> — 各 14 张卡牌</li>
+            <li data-lang="en"><code>EVENT_CARDS / CHANCE_CARDS</code> — 14 cards each</li>
+            <li data-lang="zh"><code>COLORS</code> — 六位玩家颜色、UI 调色板</li>
+            <li data-lang="en"><code>COLORS</code> — 6-player colors, UI palette</li>
+            <li data-lang="zh"><code>MAX_PLAYERS = 6</code>、<code>STARTING_FUNDS</code>、<code>PASS_EARTH_BONUS</code> 等全局常量</li>
+            <li data-lang="en"><code>MAX_PLAYERS = 6</code>, <code>STARTING_FUNDS</code>, <code>PASS_EARTH_BONUS</code> and other global constants</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- game.py -->
+      <div class="file-card">
+        <div class="fname">src/game.py <span class="tag" data-lang="zh">逻辑</span><span class="tag" data-lang="en">logic</span></div>
+        <div class="desc">
+          <span data-lang="zh">纯游戏逻辑，不含任何 pygame 绘制代码。包含：</span>
+          <span data-lang="en">Pure game logic, no pygame rendering. Contains:</span>
+          <ul>
+            <li data-lang="zh"><code>Player</code> — 玩家属性（位置、资金、星球、状态）</li>
+            <li data-lang="en"><code>Player</code> — player attributes (position, funds, planets, status)</li>
+            <li data-lang="zh"><code>GamePhase</code> — 枚举：游戏所处阶段（掷骰/购买/支付等）</li>
+            <li data-lang="en"><code>GamePhase</code> — enum of game phases (rolling, buying, paying, etc.)</li>
+            <li data-lang="zh"><code>GameState</code> — 主状态机，所有规则执行逻辑都在此</li>
+            <li data-lang="en"><code>GameState</code> — main state machine; all rule execution lives here</li>
+            <li data-lang="zh"><code>get_player_planet_list()</code> — 生成面板用的星球信息字典</li>
+            <li data-lang="en"><code>get_player_planet_list()</code> — builds the panel planet-info dicts</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ui.py -->
+      <div class="file-card">
+        <div class="fname">src/ui.py <span class="tag" data-lang="zh">渲染</span><span class="tag" data-lang="en">rendering</span></div>
+        <div class="desc">
+          <span data-lang="zh">所有 pygame 绘制函数的集合，每个都以 <code>draw_</code> 开头：</span>
+          <span data-lang="en">All pygame drawing functions, each prefixed <code>draw_</code>:</span>
+          <ul>
+            <li data-lang="zh"><code>init_assets()</code> — 加载图片、预计算棋子圆头、压暗图标</li>
+            <li data-lang="en"><code>init_assets()</code> — load images, precompute circular token heads, darken icons</li>
+            <li data-lang="zh"><code>draw_board()</code> — 棋盘 + 32 格棋子</li>
+            <li data-lang="en"><code>draw_board()</code> — board + 32 player tokens</li>
+            <li data-lang="zh"><code>draw_panel()</code> — 右侧玩家状态面板</li>
+            <li data-lang="en"><code>draw_panel()</code> — right-side player status panel</li>
+            <li data-lang="zh"><code>draw_start_screen()</code> — 选人界面（3×2 图标网格）</li>
+            <li data-lang="en"><code>draw_start_screen()</code> — player selection screen (3×2 icon grid)</li>
+            <li data-lang="zh"><code>draw_fund_notice()</code> — 资金变化弹窗（双行大字）</li>
+            <li data-lang="en"><code>draw_fund_notice()</code> — fund change popup (two-line large text)</li>
+            <li data-lang="zh">以及卡牌弹窗、星球选择器、实验选择器等</li>
+            <li data-lang="en">plus card popup, planet picker, experiment picker, etc.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- lang.py -->
+      <div class="file-card">
+        <div class="fname">src/lang.py <span class="tag" data-lang="zh">国际化</span><span class="tag" data-lang="en">i18n</span></div>
+        <div class="desc">
+          <span data-lang="zh">中英文双语支持模块。所有界面文本均在此定义，通过以下接口访问：</span>
+          <span data-lang="en">Bilingual (Chinese/English) support module. All UI text is defined here, accessed via:</span>
+          <ul>
+            <li><code>t("key", **kwargs)</code> <span data-lang="zh">— 按 key 返回当前语言文本</span><span data-lang="en">— return text for current language by key</span></li>
+            <li><code>loc_name(d)</code> <span data-lang="zh">— 从含 <code>name</code>/<code>name_en</code> 的字典返回本地化名称</span><span data-lang="en">— localised name from a dict with <code>name</code>/<code>name_en</code></span></li>
+            <li><code>player_name(i)</code> <span data-lang="zh">— 玩家名（玩家一…Player 1…）</span><span data-lang="en">— player name (玩家一 … Player 1 …)</span></li>
+            <li><code>set_lang("zh"/"en")</code> <span data-lang="zh">— 运行时切换语言</span><span data-lang="en">— switch language at runtime</span></li>
+          </ul>
+          <span data-lang="zh">游戏界面右下角的按钮可随时切换语言，棋盘图和玩家名称同步更新。</span>
+          <span data-lang="en">The in-game bottom-right button switches language at any time; board image and player names update immediately.</span>
+        </div>
+      </div>
+
+      <!-- calibrate.py -->
+      <div class="file-card">
+        <div class="fname">src/calibrate.py <span class="tag tool" data-lang="zh">工具</span><span class="tag tool" data-lang="en">tool</span></div>
+        <div class="desc">
+          <span data-lang="zh">
+            交互式棋盘格子坐标标定工具。在棋盘图上逐一点击每格的左上角和右下角，程序自动计算格子中心坐标，保存到 <code>assets/background/calibration.json</code>。
+            仅在更换棋盘图片时需要重新运行。
+          </span>
+          <span data-lang="en">
+            Interactive board-cell coordinate calibration tool. Click the top-left and bottom-right corners of each cell on the board image; the tool computes cell centres and saves them to <code>assets/background/calibration.json</code>.
+            Only needs to be re-run when the board image changes.
+          </span>
+        </div>
+      </div>
+
+      <!-- calibrate_tokens.py -->
+      <div class="file-card">
+        <div class="fname">src/calibrate_tokens.py <span class="tag tool" data-lang="zh">工具</span><span class="tag tool" data-lang="en">tool</span></div>
+        <div class="desc">
+          <span data-lang="zh">
+            角色头像圆形裁剪标定工具。对每张玩家图片，点击头部圆心和边缘，确定用于游戏棋子的圆形裁剪区域，保存到 <code>assets/token_crops.json</code>。
+            更换玩家头像时重新运行。
+          </span>
+          <span data-lang="en">
+            Player avatar circular-crop calibration tool. For each player image, click the head centre and the edge to define the circle crop used for the game token; saved to <code>assets/token_crops.json</code>.
+            Re-run when player avatars are replaced.
+          </span>
+        </div>
+      </div>
+
+      <!-- crop_tool.py -->
+      <div class="file-card">
+        <div class="fname">src/crop_tool.py <span class="tag tool" data-lang="zh">工具</span><span class="tag tool" data-lang="en">tool</span></div>
+        <div class="desc">
+          <span data-lang="zh">
+            星球图片圆形裁剪工具。拖拽鼠标在 <code>planet_1.jpg</code> 上画圆，确认后批量将全部 19 张星球图裁剪为圆形，保存到 <code>assets/planets/circles/</code>。
+          </span>
+          <span data-lang="en">
+            Planet image circular-crop tool. Drag on <code>planet_1.jpg</code> to draw a circle; confirm to batch-crop all 19 planet images into circles, saved to <code>assets/planets/circles/</code>.
+          </span>
+        </div>
+      </div>
+
+    </div><!-- /file-grid -->
+
+    <h3 data-lang="zh">模块依赖关系</h3>
+    <h3 data-lang="en">Module Dependencies</h3>
+    <div class="flow">
+      <div class="flow-step">main.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">ui.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">data.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-lang="zh">星球信息.md</div>
+      <div class="flow-step" data-lang="en">星球信息.md</div>
+    </div>
+    <div class="flow" style="margin-top:6px">
+      <div class="flow-step">main.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">game.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">data.py, lang.py</div>
+    </div>
+    <div class="flow" style="margin-top:6px">
+      <div class="flow-step">ui.py, game.py, main.py</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">lang.py</div>
+    </div>
+  </section>
+
+  <section id="dev-md">
+    <h2><span class="icon">📝</span>
+      <span data-lang="zh">数据文件说明</span>
+      <span data-lang="en">Data Files</span>
+    </h2>
+
+    <div class="file-grid">
+
+      <div class="file-card">
+        <div class="fname">data/星球信息.md <span class="tag md">Markdown</span></div>
+        <div class="desc">
+          <span data-lang="zh">
+            <strong>程序数据的唯一来源。</strong>包含 19 颗星球的完整描述、趣味知识、可做实验类型（矿物/水/植物）、以及各等级的探索费/过路费/收购费/交公价。
+            程序启动时自动解析，修改后重启即可生效，<strong>不需要改动任何代码</strong>。
+          </span>
+          <span data-lang="en">
+            <strong>The only source of truth for program data.</strong> Contains full descriptions, fun facts, experiment types (mineral/water/plant), and per-level costs (explore / toll / trade / mortgage) for all 19 planets.
+            Parsed at startup — edit and restart to take effect, <strong>no code changes needed</strong>.
+          </span>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="fname">data/事件卡.md <span class="tag md">Markdown</span></div>
+        <div class="desc">
+          <span data-lang="zh">14 张事件卡的名称、卡面描述、执行时机的完整文档。卡牌效果已硬编码在 <code>game.py</code>，此文件为参考资料，也可在修改卡牌文字时作为修改来源。</span>
+          <span data-lang="en">Full documentation of all 14 event cards: name, flavour text, and timing. Card effects are hardcoded in <code>game.py</code>; this file serves as reference and as the authoritative text source.</span>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="fname">data/机会卡.md <span class="tag md">Markdown</span></div>
+        <div class="desc">
+          <span data-lang="zh">14 张机会卡的完整文档，格式与事件卡相同。注明每张卡的资金效果和执行时机（立即执行 / 随时使用）。</span>
+          <span data-lang="en">Full documentation of all 14 chance cards in the same format as the event cards. Notes each card's fund effect and timing (immediate / any time).</span>
+        </div>
+      </div>
+
+      <div class="file-card">
+        <div class="fname">data/规则书.md <span class="tag md">Markdown</span></div>
+        <div class="desc">
+          <span data-lang="zh">从原版实体桌游说明书整理的完整规则，包括配件介绍、游戏准备、掷骰规则、星球探索升级、通行费、实验、收购、交公、特殊格子效果和游戏结束规则。供开发参考。</span>
+          <span data-lang="en">Complete rules transcribed from the original physical board game manual: components, setup, dice rules, planet exploration and upgrades, tolls, experiments, trading, mortgaging, special cell effects, and end-game rules. Developer reference.</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="quickstart">
+    <h2><span class="icon">🚀</span>
+      <span data-lang="zh">快速开始</span>
+      <span data-lang="en">Quick Start</span>
+    </h2>
+    <div class="callout green">
+      <span data-lang="zh"><strong>依赖：</strong>Python 3.10+，pygame 2.x</span>
+      <span data-lang="en"><strong>Requirements:</strong> Python 3.10+, pygame 2.x</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-lang="zh">步骤</th>
+            <th data-lang="en">Step</th>
+            <th data-lang="zh">命令</th>
+            <th data-lang="en">Command</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-lang="zh">安装依赖</td>
+            <td data-lang="en">Install deps</td>
+            <td><code>pip install pygame</code></td>
+          </tr>
+          <tr>
+            <td data-lang="zh">运行游戏</td>
+            <td data-lang="en">Run game</td>
+            <td><code>python main.py</code></td>
+          </tr>
+          <tr>
+            <td data-lang="zh">重新标定棋盘格子（换图后）</td>
+            <td data-lang="en">Recalibrate board cells (after image change)</td>
+            <td><code>python src/calibrate.py</code></td>
+          </tr>
+          <tr>
+            <td data-lang="zh">重新标定玩家头像圆形</td>
+            <td data-lang="en">Recalibrate player avatar crops</td>
+            <td><code>python src/calibrate_tokens.py</code></td>
+          </tr>
+          <tr>
+            <td data-lang="zh">批量裁剪星球图片</td>
+            <td data-lang="en">Batch-crop planet images</td>
+            <td><code>python src/crop_tool.py</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════ -->
+  <!--  GAME RULES SECTION                   -->
+  <!-- ══════════════════════════════════════ -->
+
+  <section id="rules-overview">
+    <h2><span class="icon">🎲</span>
+      <span data-lang="zh">游戏规则 — 概览</span>
+      <span data-lang="en">Game Rules — Overview</span>
+    </h2>
+
+    <h3 data-lang="zh">基本信息</h3>
+    <h3 data-lang="en">At a Glance</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">项目</th><th data-lang="en">Item</th>
+          <th data-lang="zh">内容</th><th data-lang="en">Detail</th>
+        </tr></thead>
+        <tbody>
+          <tr><td data-lang="zh">玩家人数</td><td data-lang="en">Players</td><td data-lang="zh">2 – 6 人</td><td data-lang="en">2 – 6</td></tr>
+          <tr><td data-lang="zh">起始经费</td><td data-lang="en">Starting funds</td><td data-lang="zh">200 万</td><td data-lang="en">200</td></tr>
+          <tr><td data-lang="zh">棋盘格数</td><td data-lang="en">Board cells</td><td data-lang="zh">32 格循环</td><td data-lang="en">32 (loop)</td></tr>
+          <tr><td data-lang="zh">星球数量</td><td data-lang="en">Planets</td><td data-lang="zh">19 颗</td><td data-lang="en">19</td></tr>
+          <tr><td data-lang="zh">骰子</td><td data-lang="en">Dice</td><td data-lang="zh">2 颗，按总和移动</td><td data-lang="en">2 dice, move by sum</td></tr>
+          <tr><td data-lang="zh">经过地球奖励</td><td data-lang="en">Pass Earth bonus</td><td data-lang="zh">+20 万</td><td data-lang="en">+20</td></tr>
+          <tr><td data-lang="zh">精确踏上地球</td><td data-lang="en">Land exactly on Earth</td><td data-lang="zh">+20 万 + 免费升级一颗星球</td><td data-lang="en">+20 + free planet upgrade</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 data-lang="zh">游戏流程</h3>
+    <h3 data-lang="en">Turn Flow</h3>
+    <ol class="rules">
+      <li data-lang="zh">轮到该玩家时，点击「掷骰子」，自动投出两颗骰子。</li>
+      <li data-lang="en">When it's your turn, click "Roll Dice" — two dice are thrown automatically.</li>
+      <li data-lang="zh">若投出<strong>双数（两颗相同）</strong>，本轮结束后可再投一次；若连续三次双数，立即被送入空间站，停走一轮。</li>
+      <li data-lang="en">If you roll <strong>doubles</strong>, you may roll again after resolving this turn; three consecutive doubles sends you to the Space Station immediately.</li>
+      <li data-lang="zh">棋子按骰子总点数移动，经过地球获得 20 万奖励，精确踏上地球则可额外免费升级一颗自己的星球。</li>
+      <li data-lang="en">Move your token by the dice total. Passing Earth grants +20; landing exactly on Earth also gives a free planet upgrade.</li>
+      <li data-lang="zh">落在<strong>无人星球</strong>：可选择花费探索费购买；落在<strong>他人星球</strong>：必须支付过路费，之后可选择收购该星球。</li>
+      <li data-lang="en">Land on an <strong>unclaimed planet</strong>: optionally pay the explore cost to claim it. Land on <strong>another player's planet</strong>: must pay toll, then optionally trade for it.</li>
+      <li data-lang="zh">落在特殊格子时执行对应效果（见下方格子说明）。</li>
+      <li data-lang="en">Landing on a special cell triggers its effect (see cell table below).</li>
+      <li data-lang="zh">当前玩家所有行动完成后，自动切换到下一位玩家。</li>
+      <li data-lang="en">After all actions are resolved, the turn passes to the next player.</li>
+    </ol>
+
+    <h3 data-lang="zh">掷骰子详细规则</h3>
+    <h3 data-lang="en">Dice Rules in Detail</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">情况</th><th data-lang="en">Situation</th>
+          <th data-lang="zh">效果</th><th data-lang="en">Effect</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td data-lang="zh">普通投掷</td><td data-lang="en">Normal roll</td>
+            <td data-lang="zh">按两骰总和移动，本轮结束</td>
+            <td data-lang="en">Move by sum, turn ends</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">第 1 次双数</td><td data-lang="en">1st doubles</td>
+            <td data-lang="zh">处理落点事件后，可再投一次</td>
+            <td data-lang="en">Resolve landing, then roll again</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">第 2 次双数</td><td data-lang="en">2nd doubles</td>
+            <td data-lang="zh">处理落点事件后，可再投一次</td>
+            <td data-lang="en">Resolve landing, then roll again</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">第 3 次双数</td><td data-lang="en">3rd doubles</td>
+            <td data-lang="zh" style="color:var(--accent2)">立即移动至空间站，停走一轮，本轮结束</td>
+            <td data-lang="en" style="color:var(--accent2)">Immediately sent to Space Station, skip next turn, turn ends</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">反向移动（事件卡效果）</td><td data-lang="en">Reverse (event card)</td>
+            <td data-lang="zh">下一轮反方向移动</td>
+            <td data-lang="en">Next turn moves in reverse direction</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="rules-board">
+    <h2><span class="icon">🗺</span>
+      <span data-lang="zh">棋盘格子说明（32 格）</span>
+      <span data-lang="en">Board Cells (32 total)</span>
+    </h2>
+
+    <p data-lang="zh">棋盘为 9×9 外圈，顺时针排列，格 1（地球）在右上角。</p>
+    <p data-lang="en">The board is a 9×9 outer ring arranged clockwise, with cell 1 (Earth) at the top-right.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">格子类型</th><th data-lang="en">Cell Type</th>
+          <th data-lang="zh">代表格子</th><th data-lang="en">Cells</th>
+          <th data-lang="zh">效果</th><th data-lang="en">Effect</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td data-lang="zh"><strong>起点（地球）</strong></td>
+            <td data-lang="en"><strong>Start (Earth)</strong></td>
+            <td data-lang="zh">格 1</td><td data-lang="en">Cell 1</td>
+            <td data-lang="zh">经过 +20 万；精确踏上额外免费升级一颗星球</td>
+            <td data-lang="en">Pass: +20; Land exactly: free planet upgrade</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>星球</strong></td>
+            <td data-lang="en"><strong>Planet</strong></td>
+            <td data-lang="zh">共 19 格</td><td data-lang="en">19 cells</td>
+            <td data-lang="zh">无人：可购买；他人持有：支付过路费</td>
+            <td data-lang="en">Unclaimed: buy; owned: pay toll</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>空间站</strong></td>
+            <td data-lang="en"><strong>Space Station</strong></td>
+            <td data-lang="zh">格 17</td><td data-lang="en">Cell 17</td>
+            <td data-lang="zh">停走一轮</td>
+            <td data-lang="en">Skip next turn</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>太空实验室</strong></td>
+            <td data-lang="en"><strong>Space Lab</strong></td>
+            <td data-lang="zh">格 25</td><td data-lang="en">Cell 25</td>
+            <td data-lang="zh">对自己拥有的一颗星球做一次实验（免费升级 + 过路费翻倍）</td>
+            <td data-lang="en">Conduct one experiment on your planet (free upgrade + toll ×2)</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>宜居带</strong></td>
+            <td data-lang="en"><strong>Habitable Zone</strong></td>
+            <td data-lang="zh">格 9</td><td data-lang="en">Cell 9</td>
+            <td data-lang="zh">再投一次骰子</td>
+            <td data-lang="en">Roll again</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>事件卡</strong></td>
+            <td data-lang="en"><strong>Event Card</strong></td>
+            <td data-lang="zh">格 4、14</td><td data-lang="en">Cells 4, 14</td>
+            <td data-lang="zh">抽取一张事件卡并执行</td>
+            <td data-lang="en">Draw and resolve an event card</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>机会卡</strong></td>
+            <td data-lang="en"><strong>Chance Card</strong></td>
+            <td data-lang="zh">格 14、27</td><td data-lang="en">Cells 14, 27</td>
+            <td data-lang="zh">抽取一张机会卡并执行</td>
+            <td data-lang="en">Draw and resolve a chance card</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>补给站（+20）</strong></td>
+            <td data-lang="en"><strong>Supply Depot (+20)</strong></td>
+            <td data-lang="zh">格 10</td><td data-lang="en">Cell 10</td>
+            <td data-lang="zh">从银行获得 20 万</td>
+            <td data-lang="en">Gain 20 from the bank</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>定时检修（−20）</strong></td>
+            <td data-lang="en"><strong>Routine Check (−20)</strong></td>
+            <td data-lang="zh">格 18</td><td data-lang="en">Cell 18</td>
+            <td data-lang="zh">支付 20 万给银行</td>
+            <td data-lang="en">Pay 20 to the bank</td>
+          </tr>
+          <tr>
+            <td data-lang="zh"><strong>遭遇太空垃圾（−50）</strong></td>
+            <td data-lang="en"><strong>Space Debris (−50)</strong></td>
+            <td data-lang="zh">格 11</td><td data-lang="en">Cell 11</td>
+            <td data-lang="zh">支付 50 万给银行</td>
+            <td data-lang="en">Pay 50 to the bank</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="rules-planets">
+    <h2><span class="icon">🪐</span>
+      <span data-lang="zh">星球探索系统</span>
+      <span data-lang="en">Planet Exploration System</span>
+    </h2>
+
+    <h3 data-lang="zh">探索等级（4 级）</h3>
+    <h3 data-lang="en">Exploration Levels (4 levels)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">等级</th><th data-lang="en">Level</th>
+          <th data-lang="zh">名称</th><th data-lang="en">Name</th>
+          <th data-lang="zh">获得方式</th><th data-lang="en">How to reach</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>Lv 1</td>
+            <td>Lv 1</td>
+            <td data-lang="zh">观测</td><td data-lang="en">Observation</td>
+            <td data-lang="zh">落在无人星球并支付探索费（初次购买）</td>
+            <td data-lang="en">Land on unclaimed planet, pay explore cost (initial purchase)</td>
+          </tr>
+          <tr>
+            <td>Lv 2</td>
+            <td>Lv 2</td>
+            <td data-lang="zh">卫星探测</td><td data-lang="en">Satellite Probe</td>
+            <td data-lang="zh">再次落在自己的星球，支付升级费</td>
+            <td data-lang="en">Land on own planet again, pay upgrade cost</td>
+          </tr>
+          <tr>
+            <td>Lv 3</td>
+            <td>Lv 3</td>
+            <td data-lang="zh">着陆车探测</td><td data-lang="en">Rover Probe</td>
+            <td data-lang="zh">再次落在自己的星球，支付升级费</td>
+            <td data-lang="en">Land on own planet again, pay upgrade cost</td>
+          </tr>
+          <tr>
+            <td>Lv 4</td>
+            <td>Lv 4</td>
+            <td data-lang="zh">成功探索（最高级）</td><td data-lang="en">Full Exploration (max)</td>
+            <td data-lang="zh">再次落在自己的星球，支付升级费；<strong>到达此级不可被收购</strong></td>
+            <td data-lang="en">Land on own planet again, pay upgrade cost; <strong>cannot be traded at this level</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout yellow">
+      <span data-lang="zh">⚠ 部分星球只有 2 或 3 个探索等级（在星球信息中等级费用显示为 "—"）。</span>
+      <span data-lang="en">⚠ Some planets only have 2 or 3 exploration levels (shown as "—" in the planet data).</span>
+    </div>
+
+    <h3 data-lang="zh">过路费</h3>
+    <h3 data-lang="en">Tolls</h3>
+    <p data-lang="zh">对手落在你的星球时须支付过路费，金额随探索等级升高。每做一次实验，当前过路费 ×2。</p>
+    <p data-lang="en">Opponents landing on your planet must pay the toll, which increases with level. Each experiment doubles the current toll.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">实验次数</th><th data-lang="en">Experiments done</th>
+          <th data-lang="zh">过路费倍数</th><th data-lang="en">Toll multiplier</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>0</td><td>0</td><td>×1</td><td>×1</td></tr>
+          <tr><td>1</td><td>1</td><td>×2</td><td>×2</td></tr>
+          <tr><td>2</td><td>2</td><td>×4</td><td>×4</td></tr>
+          <tr><td>3</td><td>3</td><td>×8</td><td>×8</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 data-lang="zh">实验（太空实验室触发）</h3>
+    <h3 data-lang="en">Experiments (triggered at Space Lab)</h3>
+    <p data-lang="zh">落在太空实验室时，可对自己持有的一颗支持实验的星球做一次实验。效果：该星球免费升一级，并且过路费翻倍。每种实验每颗星球只能做一次。</p>
+    <p data-lang="en">Landing on the Space Lab lets you conduct one experiment on one of your planets that supports it. Effect: free +1 upgrade level and toll ×2. Each experiment type can only be done once per planet.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">实验类型</th><th data-lang="en">Experiment Type</th>
+          <th data-lang="zh">说明</th><th data-lang="en">Notes</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td data-lang="zh">采集矿物</td><td data-lang="en">Mining</td>
+            <td data-lang="zh">部分星球支持</td><td data-lang="en">Available on some planets</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">水实验</td><td data-lang="en">Water Test</td>
+            <td data-lang="zh">部分星球支持</td><td data-lang="en">Available on some planets</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">植物实验</td><td data-lang="en">Plant Test</td>
+            <td data-lang="zh">部分星球支持（较少）</td><td data-lang="en">Available on fewer planets</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 data-lang="zh">收购（交易）</h3>
+    <h3 data-lang="en">Trading (Acquiring a Planet)</h3>
+    <ol class="rules">
+      <li data-lang="zh">落在他人星球，支付过路费后，可申请以收购费购买该星球的探索权。</li>
+      <li data-lang="en">After paying the toll on an opponent's planet, you may offer the trade price to acquire it.</li>
+      <li data-lang="zh">星球主人可以<strong>拒绝</strong>交易。</li>
+      <li data-lang="en">The planet owner may <strong>refuse</strong> the trade.</li>
+      <li data-lang="zh">已达 <strong>Lv 4（成功探索）</strong>的星球<strong>不可</strong>被收购。</li>
+      <li data-lang="en">Planets at <strong>Lv 4 (Full Exploration)</strong> <strong>cannot</strong> be traded.</li>
+      <li data-lang="zh">收购费 = 星球卡上各已完成探索等级对应收购费之和。</li>
+      <li data-lang="en">Trade cost = sum of the trade costs for all levels already explored (from the planet card).</li>
+    </ol>
+
+    <h3 data-lang="zh">交公（抵押给银行）</h3>
+    <h3 data-lang="en">Mortgaging (Selling to the Bank)</h3>
+    <ol class="rules">
+      <li data-lang="zh">无力支付过路费或其他费用时，可选择将自己的星球交公给银行换取经费。</li>
+      <li data-lang="en">When unable to pay a toll or other cost, you may mortgage your planet to the bank for funds.</li>
+      <li data-lang="zh">交公后，该星球的所有探索项目归零，重新成为无人星球。</li>
+      <li data-lang="en">After mortgaging, all exploration levels are reset and the planet becomes unclaimed again.</li>
+      <li data-lang="zh">交公价 = 星球卡上各已完成探索等级对应交公价之和。</li>
+      <li data-lang="en">Mortgage value = sum of mortgage values for all completed exploration levels.</li>
+    </ol>
+
+    <h3 data-lang="zh">所有 19 颗星球一览</h3>
+    <h3 data-lang="en">All 19 Planets</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>ID</th>
+          <th data-lang="zh">星球</th><th data-lang="en">Planet</th>
+          <th data-lang="zh">实验支持</th><th data-lang="en">Experiments</th>
+          <th data-lang="zh">Lv1 探索/过路</th><th data-lang="en">Lv1 Cost/Toll</th>
+          <th data-lang="zh">Lv4 过路</th><th data-lang="en">Lv4 Toll</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>1</td><td data-lang="zh">金星</td><td data-lang="en">Venus</td><td data-lang="zh">矿、水</td><td data-lang="en">M, W</td><td>12 / 3</td><td>12 / 3</td><td>39</td><td>39</td></tr>
+          <tr><td>2</td><td data-lang="zh">水星</td><td data-lang="en">Mercury</td><td data-lang="zh">矿</td><td data-lang="en">M</td><td>18 / 6</td><td>18 / 6</td><td>62</td><td>62</td></tr>
+          <tr><td>3</td><td data-lang="zh">坦普尔一号彗星</td><td data-lang="en">Temple 1 Comet</td><td data-lang="zh">—</td><td data-lang="en">—</td><td>4 / 1</td><td>4 / 1</td><td>45</td><td>45</td></tr>
+          <tr><td>4</td><td data-lang="zh">格利泽581g</td><td data-lang="en">Gliese 581g</td><td data-lang="zh">矿、水、植</td><td data-lang="en">M, W, P</td><td>20 / 7</td><td>20 / 7</td><td>60</td><td>60</td></tr>
+          <tr><td>5</td><td data-lang="zh">哈雷彗星</td><td data-lang="en">Halley's Comet</td><td data-lang="zh">—</td><td data-lang="en">—</td><td>10 / 3</td><td>10 / 3</td><td>28</td><td>28</td></tr>
+          <tr><td>6</td><td data-lang="zh">比邻星</td><td data-lang="en">Proxima Centauri</td><td data-lang="zh">矿、水、植</td><td data-lang="en">M, W, P</td><td>16 / 5</td><td>16 / 5</td><td>60</td><td>60</td></tr>
+          <tr><td>7</td><td data-lang="zh">冥王星</td><td data-lang="en">Pluto</td><td data-lang="zh">矿</td><td data-lang="en">M</td><td>8 / 2</td><td>8 / 2</td><td>22</td><td>22</td></tr>
+          <tr><td>8</td><td data-lang="zh">天狼星</td><td data-lang="en">Sirius</td><td data-lang="zh">矿、水、植</td><td data-lang="en">M, W, P</td><td>20 / 7</td><td>20 / 7</td><td>68</td><td>68</td></tr>
+          <tr><td>9</td><td data-lang="zh">海王星</td><td data-lang="en">Neptune</td><td data-lang="zh">水</td><td data-lang="en">W</td><td>8 / 2</td><td>8 / 2</td><td>22</td><td>22</td></tr>
+          <tr><td>10</td><td data-lang="zh">天王星</td><td data-lang="en">Uranus</td><td data-lang="zh">矿、水</td><td data-lang="en">M, W</td><td>12 / 3</td><td>12 / 3</td><td>65</td><td>65</td></tr>
+          <tr><td>11</td><td data-lang="zh">土卫六</td><td data-lang="en">Titan</td><td data-lang="zh">矿、水</td><td data-lang="en">M, W</td><td>6 / 1</td><td>6 / 1</td><td>45</td><td>45</td></tr>
+          <tr><td>12</td><td data-lang="zh">土卫二</td><td data-lang="en">Enceladus</td><td data-lang="zh">水</td><td data-lang="en">W</td><td>8 / 2</td><td>8 / 2</td><td>60</td><td>60</td></tr>
+          <tr><td>13</td><td data-lang="zh">土星</td><td data-lang="en">Saturn</td><td data-lang="zh">—</td><td data-lang="en">—</td><td>14 / 4</td><td>14 / 4</td><td>46</td><td>46</td></tr>
+          <tr><td>14</td><td data-lang="zh">木卫二</td><td data-lang="en">Europa</td><td data-lang="zh">水</td><td data-lang="en">W</td><td>10 / 3</td><td>10 / 3</td><td>28</td><td>28</td></tr>
+          <tr><td>15</td><td data-lang="zh">木星</td><td data-lang="en">Jupiter</td><td data-lang="zh">矿、水</td><td data-lang="en">M, W</td><td>14 / 5</td><td>14 / 5</td><td>47</td><td>47</td></tr>
+          <tr><td>16</td><td data-lang="zh">艳后星</td><td data-lang="en">Kleopatra</td><td data-lang="zh">矿</td><td data-lang="en">M</td><td>2 / 1</td><td>2 / 1</td><td>25</td><td>25</td></tr>
+          <tr><td>17</td><td data-lang="zh">谷神星</td><td data-lang="en">Ceres</td><td data-lang="zh">矿、水</td><td data-lang="en">M, W</td><td>3 / 1</td><td>3 / 1</td><td>25</td><td>25</td></tr>
+          <tr><td>18</td><td data-lang="zh">火星</td><td data-lang="en">Mars</td><td data-lang="zh">矿、水、植</td><td data-lang="en">M, W, P</td><td>22 / 8</td><td>22 / 8</td><td>70</td><td>70</td></tr>
+          <tr><td>19</td><td data-lang="zh">月球</td><td data-lang="en">Moon</td><td data-lang="zh">矿</td><td data-lang="en">M</td><td>16 / 5</td><td>16 / 5</td><td>60</td><td>60</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:.82rem;color:var(--text-muted)" data-lang="zh">M=采集矿物，W=水实验，P=植物实验。Lv1 探索/过路 格式：探索费 / 过路费（单位：万）。</p>
+    <p style="font-size:.82rem;color:var(--text-muted)" data-lang="en">M=Mining, W=Water Test, P=Plant Test. Lv1 Cost/Toll format: explore cost / toll (units: ×10,000).</p>
+  </section>
+
+  <section id="rules-cards">
+    <h2><span class="icon">🃏</span>
+      <span data-lang="zh">卡牌</span>
+      <span data-lang="en">Cards</span>
+    </h2>
+
+    <h3 data-lang="zh">持有规则</h3>
+    <h3 data-lang="en">Holding Rules</h3>
+    <div class="callout yellow">
+      <span data-lang="zh">标注「随时使用」的卡可保留在手中，适时使用。<strong>最多只能持有 1 张免费卡</strong>；再次获得同类卡时，只能保留其一，另一张返还。</span>
+      <span data-lang="en">Cards marked "any time" can be kept and used when needed. <strong>Maximum 1 free-pass card may be held</strong>; drawing another returns the excess.</span>
+    </div>
+
+    <h3 data-lang="zh">事件卡（14 张）</h3>
+    <h3 data-lang="en">Event Cards (14 cards)</h3>
+    <div class="card-list">
+      <div class="card-item">
+        <div class="cname" data-lang="zh">疑有黑洞</div>
+        <div class="cname" data-lang="en">Black Hole Warning</div>
+        <div class="ceff" data-lang="zh">下一轮反向行走</div>
+        <div class="ceff" data-lang="en">Move in reverse next turn</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">去往火星</div>
+        <div class="cname" data-lang="en">Go to Mars</div>
+        <div class="ceff" data-lang="zh">传送到火星</div>
+        <div class="ceff" data-lang="en">Teleport to Mars</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">调配探索者</div>
+        <div class="cname" data-lang="en">Reposition Explorers</div>
+        <div class="ceff" data-lang="zh">移动其他玩家棋子，共 3 次机会</div>
+        <div class="ceff" data-lang="en">Move other players' tokens, 3 moves total</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">原路返回</div>
+        <div class="cname" data-lang="en">Return to Start</div>
+        <div class="ceff" data-lang="zh">退回本次出发格（不经过地球）</div>
+        <div class="ceff" data-lang="en">Return to the cell you started from this turn (no Earth bonus)</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">互换星球</div>
+        <div class="cname" data-lang="en">Swap Planets</div>
+        <div class="ceff" data-lang="zh">与选定玩家各交换一颗星球</div>
+        <div class="ceff" data-lang="en">Swap one planet with a chosen player</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">前往太空实验室</div>
+        <div class="cname" data-lang="en">Go to Space Lab</div>
+        <div class="ceff" data-lang="zh">传送到太空实验室并可做实验</div>
+        <div class="ceff" data-lang="en">Teleport to Space Lab and conduct an experiment</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">前往国际空间站</div>
+        <div class="cname" data-lang="en">Go to Space Station</div>
+        <div class="ceff" data-lang="zh">传送到空间站，停走一轮</div>
+        <div class="ceff" data-lang="en">Teleport to Space Station, skip next turn</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">暂停一轮</div>
+        <div class="cname" data-lang="en">Skip a Turn</div>
+        <div class="ceff" data-lang="zh">下一轮停走</div>
+        <div class="ceff" data-lang="en">Skip next turn</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">彗星失联</div>
+        <div class="cname" data-lang="en">Comet Disruption</div>
+        <div class="ceff" data-lang="zh">所有持有彗星星球的玩家停走一轮</div>
+        <div class="ceff" data-lang="en">All players owning a comet planet skip next turn</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">重新出发</div>
+        <div class="cname" data-lang="en">Restart</div>
+        <div class="ceff" data-lang="zh">返回地球，经费重置为起始金额</div>
+        <div class="ceff" data-lang="en">Return to Earth, funds reset to starting amount</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">抽取机会卡</div>
+        <div class="cname" data-lang="en">Draw a Chance Card</div>
+        <div class="ceff" data-lang="zh">额外抽取一张机会卡</div>
+        <div class="ceff" data-lang="en">Draw an additional Chance Card</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">一次机会</div>
+        <div class="cname" data-lang="en">One Chance</div>
+        <div class="ceff" data-lang="zh">选择：再投一次骰子，或抽一张机会卡</div>
+        <div class="ceff" data-lang="en">Choose: roll dice again, or draw a Chance Card</div>
+        <div class="ctiming" data-lang="zh">立即执行</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">求救 ⭐</div>
+        <div class="cname" data-lang="en">SOS ⭐</div>
+        <div class="ceff" data-lang="zh">免过路费一次（可保留随时使用）</div>
+        <div class="ceff" data-lang="en">Skip one toll payment (keep and use any time)</div>
+        <div class="ctiming" data-lang="zh">随时使用</div><div class="ctiming" data-lang="en">Any time</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">意外惊喜</div>
+        <div class="cname" data-lang="en">Surprise</div>
+        <div class="ceff" data-lang="zh">向前走 5 步</div>
+        <div class="ceff" data-lang="en">Move forward 5 spaces</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+    </div>
+
+    <h3 data-lang="zh">机会卡（14 张）</h3>
+    <h3 data-lang="en">Chance Cards (14 cards)</h3>
+    <div class="card-list">
+      <div class="card-item">
+        <div class="cname" data-lang="zh">有新的发现</div>
+        <div class="cname" data-lang="en">New Discovery</div>
+        <div class="ceff" data-lang="zh">后退 5 步</div>
+        <div class="ceff" data-lang="en">Move back 5 spaces</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">战胜恐惧和孤独</div>
+        <div class="cname" data-lang="en">Conquer Fear</div>
+        <div class="ceff" data-lang="zh">再投一次骰子</div>
+        <div class="ceff" data-lang="en">Roll again</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">不要担心犯错</div>
+        <div class="cname" data-lang="en">Don't Fear Mistakes</div>
+        <div class="ceff" data-lang="zh">回到起点（地球）</div>
+        <div class="ceff" data-lang="en">Return to Earth</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">地球人在呼叫你 ⭐</div>
+        <div class="cname" data-lang="en">Earth is Calling ⭐</div>
+        <div class="ceff" data-lang="zh">免费探索一颗未被探索的星球</div>
+        <div class="ceff" data-lang="en">Explore any unclaimed planet for free</div>
+        <div class="ctiming" data-lang="zh">随时使用</div><div class="ctiming" data-lang="en">Any time</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">每日健身时间</div>
+        <div class="cname" data-lang="en">Daily Exercise</div>
+        <div class="ceff" data-lang="zh">−10 万</div>
+        <div class="ceff" data-lang="en">−10</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">分享财富</div>
+        <div class="cname" data-lang="en">Share Wealth</div>
+        <div class="ceff" data-lang="zh">给任意一名玩家 30 万，自己 −30 万</div>
+        <div class="ceff" data-lang="en">Give 30 to any player, you pay −30</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">前往太空实验室</div>
+        <div class="cname" data-lang="en">Go to Space Lab</div>
+        <div class="ceff" data-lang="zh">传送到太空实验室</div>
+        <div class="ceff" data-lang="en">Teleport to Space Lab</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">获得奖励</div>
+        <div class="cname" data-lang="en">Bonus Reward</div>
+        <div class="ceff" data-lang="zh">+50 万</div>
+        <div class="ceff" data-lang="en">+50</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">吃饭时间不要说话</div>
+        <div class="cname" data-lang="en">No Talking at Mealtime</div>
+        <div class="ceff" data-lang="zh">−10 万</div>
+        <div class="ceff" data-lang="en">−10</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">虚心学习 ⭐</div>
+        <div class="cname" data-lang="en">Keep Learning ⭐</div>
+        <div class="ceff" data-lang="zh">+30 万（可保留随时使用）</div>
+        <div class="ceff" data-lang="en">+30 (keep and use any time)</div>
+        <div class="ctiming" data-lang="zh">随时使用</div><div class="ctiming" data-lang="en">Any time</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">"迷糊觉"</div>
+        <div class="cname" data-lang="en">Space Nap</div>
+        <div class="ceff" data-lang="zh">停走一轮</div>
+        <div class="ceff" data-lang="en">Skip next turn</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">合格的探索者</div>
+        <div class="cname" data-lang="en">Qualified Explorer</div>
+        <div class="ceff" data-lang="zh">−50 万</div>
+        <div class="ceff" data-lang="en">−50</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">分享趣事 ⭐</div>
+        <div class="cname" data-lang="en">Share a Story ⭐</div>
+        <div class="ceff" data-lang="zh">本轮无事发生（可保留随时使用）</div>
+        <div class="ceff" data-lang="en">Nothing happens this turn (keep and use any time)</div>
+        <div class="ctiming" data-lang="zh">随时使用</div><div class="ctiming" data-lang="en">Any time</div>
+      </div>
+      <div class="card-item">
+        <div class="cname" data-lang="zh">前往太空实验室</div>
+        <div class="cname" data-lang="en">Go to Space Lab</div>
+        <div class="ceff" data-lang="zh">传送到太空实验室</div>
+        <div class="ceff" data-lang="en">Teleport to Space Lab</div>
+        <div class="ctiming" data-lang="zh">立即使用</div><div class="ctiming" data-lang="en">Immediate</div>
+      </div>
+    </div>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-top:8px" data-lang="zh">⭐ 标注的卡可以保留在手中，适时使用（最多持有 1 张免费卡）。</p>
+    <p style="font-size:.82rem;color:var(--text-muted);margin-top:8px" data-lang="en">⭐ = can be kept in hand and used any time (max 1 free-pass card).</p>
+  </section>
+
+  <section id="rules-end">
+    <h2><span class="icon">🏆</span>
+      <span data-lang="zh">游戏结束与破产</span>
+      <span data-lang="en">Game End &amp; Bankruptcy</span>
+    </h2>
+
+    <h3 data-lang="zh">结束条件</h3>
+    <h3 data-lang="en">End Conditions</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th data-lang="zh">触发条件</th><th data-lang="en">Trigger</th>
+          <th data-lang="zh">结果</th><th data-lang="en">Result</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td data-lang="zh">所有其他玩家破产，仅剩 1 人</td>
+            <td data-lang="en">All others bankrupt, 1 player left</td>
+            <td data-lang="zh">该玩家直接获胜</td>
+            <td data-lang="en">That player wins immediately</td>
+          </tr>
+          <tr>
+            <td data-lang="zh">某一玩家破产（其余人仍在）</td>
+            <td data-lang="en">One player goes bankrupt (others remain)</td>
+            <td data-lang="zh">游戏结束，所有剩余玩家清算总资产，最多者获胜</td>
+            <td data-lang="en">Game ends; all remaining players tally net worth, highest wins</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 data-lang="zh">总资产计算</h3>
+    <h3 data-lang="en">Net Worth Calculation</h3>
+    <div class="callout green">
+      <span data-lang="zh"><strong>总资产 = 当前经费 + 所有持有星球的交公价总和</strong>（即按最差情况变现的总价值）。</span>
+      <span data-lang="en"><strong>Net worth = current funds + sum of mortgage values of all owned planets</strong> (i.e. worst-case liquidation value).</span>
+    </div>
+
+    <h3 data-lang="zh">破产流程</h3>
+    <h3 data-lang="en">Bankruptcy Process</h3>
+    <ol class="rules">
+      <li data-lang="zh">经费不足以支付过路费或其他费用时，先尝试出售（交公）自己的星球换取经费。</li>
+      <li data-lang="en">When unable to pay, first try selling (mortgaging) your planets to raise funds.</li>
+      <li data-lang="zh">若卖光所有星球仍无法凑齐所需金额，宣布破产，退出游戏。</li>
+      <li data-lang="en">If selling everything still doesn't cover the debt, declare bankruptcy and exit the game.</li>
+      <li data-lang="zh">破产者的所有星球归还银行（重置为无人状态）。</li>
+      <li data-lang="en">All bankrupt player's planets return to the bank (reset to unclaimed).</li>
+    </ol>
+
+    <h3 data-lang="zh">排名</h3>
+    <h3 data-lang="en">Rankings</h3>
+    <p data-lang="zh">游戏结束后，按总资产从高到低显示所有玩家排名。破产者排在末位。</p>
+    <p data-lang="en">At game end, all players are ranked by net worth (highest first). Bankrupt players are ranked last.</p>
+  </section>
+
+</div><!-- /container -->
+
+<footer>
+  <span data-lang="zh">星际征途探索强手棋 · Python 重实现 · 原版 Scratch 作者：hufuzhipeng</span>
+  <span data-lang="en">Space Chess: Cosmic Explorer · Python reimplementation · Original Scratch by: hufuzhipeng</span>
+</footer>
+
+<script>
+function setLang(lang) {
+  document.body.classList.toggle('en', lang === 'en');
+  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.documentElement.lang = lang === 'en' ? 'en' : 'zh';
+}
+</script>
+</body>
+</html>
